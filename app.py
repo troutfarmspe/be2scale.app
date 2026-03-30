@@ -16,7 +16,7 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # 2. Encabezado Institucional
-st.image("https://img.icons8.com", width=60)
+st.markdown("# 🧬")
 st.title("BE2SCALE")
 st.markdown("### **Bio-Economic Optimizer v1.0**")
 st.write("---")
