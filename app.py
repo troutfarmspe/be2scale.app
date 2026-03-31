@@ -55,7 +55,7 @@ else:
     nota_o2 = "Condiciones ideales para conversión alimenticia de alta velocidad."
 
 # --- CREACIÓN DE PESTAÑAS ---
-tab1, tab2 = st.tabs(["💰 Análisis Económico", "🧬 Ingeniería Bio-Térmica"])
+tab1, tab2, tab3 = st.tabs(["💰 Análisis Económico", "🧬 Ingeniería Bio-Térmica", "📐 Capacidad de Carga"])
 
 with tab1:
     st.subheader(f"Simulación de Eficiencia: {entidad_nombre}")
