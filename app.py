@@ -95,30 +95,45 @@ with tab2:
     st.progress(min(o2_real/12.0, 1.0))
 
 with tab3:
-    st.subheader("📐 Cálculo de Capacidad de Carga (Carrying Capacity)")
-    st.write("Determinación de densidad máxima basada en el flujo de Oxígeno disponible.")
+    st.subheader("📐 Capacidad de Carga Científica")
+    
+    col_t1, col_t2 = st.columns(2)
+    with col_t1:
+        tipo_tanque = st.selectbox("Estructura de Cultivo", ["Rectangular (Raceway)", "Circular (Concreto/Geomembrana)", "Jaula Flotante"])
+        volumen = st.number_input("Volumen Total (m³)", value=100, step=10)
+    with col_t2:
+        recambio_hora = st.slider("Recambios de agua por hora (R)", 0.5, 4.0, 1.0, help="Veces que se renueva el volumen total en 1 hora.")
 
-    tipo_tanque = st.selectbox("Tipo de Estructura", ["Circular (Concreto/Geomembrana)", "Rectangular (Raceway)", "Jaula Flotante"])
-    volumen = st.number_input("Volumen Total de Cultivo (m³)", value=100, step=10)
+    # --- LÓGICA DE INGENIERÍA AQUA-SCALE ---
+    # 1. Consumo de O2 estimado para Trucha (0.2 - 0.4 g O2 / kg pez / hora)
+    consumo_o2_kg = 0.25 
+    # 2. Oxígeno disponible para el pez (O2 Real - O2 salida seguridad [5 mg/L])
+    o2_disponible = max(o2_real - 5.0, 0.1)
+    
+    # 3. Fórmula de Capacidad de Carga (Basada en Flujo y Oxígeno)
+    # Capacidad (kg) = (Flujo L/h * O2 disponible mg/L) / Consumo O2 mg/kg/h
+    flujo_l_h = volumen * 1000 * recambio_hora
+    biomasa_max = (flujo_l_h * o2_disponible) / (consumo_o2_kg * 1000)
+    
+    # Ajuste por tipo de estructura (Eficiencia de mezcla)
+    if tipo_tanque == "Jaula Flotante": biomasa_max *= 0.7  # Menor control de flujo
+    if tipo_tanque == "Circular (Concreto/Geomembrana)": biomasa_max *= 1.1 # Mejor autolimpieza/mezcla
+    
+    densidad_max = biomasa_max / volumen
 
-    # Lógica Técnica: La capacidad de carga depende directamente del O2 Real calculado en Tab 2
-    # Estándar técnico: Se requiere aprox 1.2 a 1.5 kg de trucha por cada 1 mg/L de O2 disponible por m3 (simplificado)
-    factor_forma = 1.2 if tipo_tanque == "Jaula Flotante" else 1.5
-    densidad_max = o2_real * factor_forma
-    biomasa_max = densidad_max * volumen
-
-    # Visualización de Velocímetro de Carga
+    # Visualización Senior
     st.markdown(f"""
         <div style="background-color:#112240; padding:20px; border-radius:10px; border-top: 5px solid #00897B;">
-            <p style="color:gray; margin:0;">DENSIDAD MÁXIMA SUGERIDA</p>
+            <p style="color:gray; margin:0;">DENSIDAD TÉCNICA RECOMENDADA</p>
             <h2 style="color:#00897B; margin:0;">{densidad_max:.2f} kg/m³</h2>
             <hr>
-            <p style="color:gray; margin:0;">CAPACIDAD TOTAL DEL SISTEMA</p>
+            <p style="color:gray; margin:0;">BIOMASA MÁXIMA SOPORTADA</p>
             <h1 style="color:white; margin:0;">{biomasa_max:,.0f} Kg de Trucha</h1>
+            <p style="color:#FFA500; font-size:0.9em;">*Cálculo basado en {recambio_hora} recambio(s)/hora y {o2_real:.2f} mg/L de O₂ de entrada.</p>
         </div>
     """, unsafe_allow_html=True)
 
-    st.info(f"**Nota Técnica:** A {altitud} msnm, su límite biológico es de {densidad_max:.1f} kg/m³. Superar este número sin aireación mecánica causará un pico de FCR y mortalidad por estrés hipóxico.")
+    st.warning(f"**Nota de Consultoría:** Si desea subir de {densidad_max:.1f} kg/m³, es imperativo implementar **Aireación Mecánica** o inyección de Oxígeno líquido.")
 
 
 # --- FUNCIÓN DE REPORTE PDF AVANZADO ---
