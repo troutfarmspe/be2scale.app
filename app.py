@@ -163,87 +163,74 @@ with tab4:
 
 
 # --- FUNCIÓN DE REPORTE PDF AVANZADO ---
-def create_final_pdf(tipo, vol, dens_max, bio_max):
+# --- FUNCIÓN DE REPORTE FINAL CONSOLIDADO v1.9 ---
+def create_final_pdf(nombre, tm, fcr_a, fcr_o, gasto_a, gasto_o, ahorro, o2, status, tipo, vol, dens_max, bio_max):
     pdf = FPDF()
     pdf.add_page()
     
-    # Título y Marca
-    pdf.set_font("Arial", 'B', 18)
+    # Encabezado BE2SCALE & Marco Legal
+    pdf.set_font("Arial", 'B', 16)
     pdf.set_text_color(0, 51, 102)
-    pdf.cell(190, 15, txt="INFORME TÉCNICO DE RENTABILIDAD", ln=True, align='C')
-    pdf.set_font("Arial", size=9)
-    pdf.set_text_color(100, 100, 100)
-    pdf.cell(190, 5, txt=f"BE2SCALE - AQUAMARKET S.A.C. | RUC: 20601363628 | {datetime.datetime.now().strftime('%d/%m/%Y')}", ln=True, align='C')
-   
-    # En el encabezado del PDF, debajo del título:
+    pdf.cell(190, 10, txt="INFORME TÉCNICO ESTRATÉGICO BE2SCALE", ln=True, align='C')
     pdf.set_font("Arial", 'I', 8)
-    pdf.cell(190, 5, txt="Basado en la Norma Técnica Peruana NTP 032.103:2024 y estándares AMYPE", ln=True, align='C')
+    pdf.set_text_color(100, 100, 100)
+    pdf.cell(190, 5, txt="Basado en la Norma Técnica Peruana NTP 032.103:2024 y Estándares AMYPE", ln=True, align='C')
+    pdf.cell(190, 5, txt=f"Emitido por Aquamarket S.A.C. | RUC: 20601363628 | {datetime.datetime.now().strftime('%d/%m/%Y')}", ln=True, align='C')
+    
+    # 1. Datos de la Entidad
     pdf.ln(10)
     pdf.set_text_color(0, 0, 0)
     pdf.set_font("Arial", 'B', 12)
-    pdf.cell(190, 10, txt=f" CLIENTE: {entidad_nombre.upper()}", border=1, ln=True, fill=False)
+    pdf.set_fill_color(240, 240, 240)
+    pdf.cell(190, 10, txt=f" CLIENTE: {nombre.upper()}", border=1, ln=True, fill=True)
     
-    # 1. Diagnóstico Bio-Térmico
+    # 2. Diagnóstico Bio-Térmico y Capacidad de Carga
     pdf.ln(5)
     pdf.set_font("Arial", 'B', 11)
-    pdf.cell(190, 10, txt="1. DIAGNÓSTICO BIOMÉTRICO (SATURACIÓN O2):", ln=True)
+    pdf.cell(190, 10, txt="1. AUDITORÍA BIOMÉTRICA Y DE INFRAESTRUCTURA:", ln=True)
     pdf.set_font("Arial", size=10)
-    pdf.multi_cell(190, 6, txt=f"A una altitud de {altitud} msnm y temperatura de {temp_agua}C, el oxígeno disponible es de {o2_real:.2f} mg/L. Estatus: {status_o2}. {nota_o2}")
-
-    # 2. CAPACIDAD DE CARGA DE INFRAESTRUCTURA (Nuevo Bloque)
-    pdf.ln(5)
-    pdf.set_font("Arial", 'B', 11)
-    pdf.cell(190, 10, txt=f"2. EVALUACIÓN DE INFRAESTRUCTURA ({tipo.upper()}):", ln=True)
-    pdf.set_font("Arial", size=10)
-    pdf.cell(95, 8, txt=f" Volumen de Cultivo: {vol} m3", border=1)
-    pdf.cell(95, 8, txt=f" Densidad Máxima sugerida: {dens_max:.2f} kg/m3", border=1, ln=True)
-    pdf.set_font("Arial", 'B', 10)
-    pdf.cell(190, 8, txt=f" Límite Biológico del Sistema: {bio_max:,.0f} Kg de Trucha", border=1, ln=True, align='C')
-    pdf.ln(5)
-
-    # 3. Análisis Financiero
-    pdf.ln(5)
-    pdf.set_font("Arial", 'B', 11)
-    pdf.cell(190, 10, txt="2. OPTIMIZACIÓN DEL GASTO OPERATIVO:", ln=True)
-    pdf.set_font("Arial", size=10)
-    pdf.cell(95, 10, txt=f"Gasto Actual (FCR {fcr_actual}):", border=1)
-    pdf.cell(95, 10, txt=f"S/ {gasto_actual:,.2f}", border=1, ln=True)
-    pdf.cell(95, 10, txt=f"Meta BE2SCALE (FCR {fcr_objetivo:.2f}):", border=1)
-    pdf.cell(95, 10, txt=f"S/ {gasto_meta:,.2f}", border=1, ln=True)
+    pdf.multi_cell(190, 6, txt=f"Saturación de O2: {o2:.2f} mg/L (Estatus: {status}).\nEstructura: {tipo} | Capacidad de Carga Máxima: {bio_max:,.0f} Kg ({dens_max:.2f} kg/m3).")
     
+    # 3. Análisis Económico de Rescate
+    pdf.ln(5)
+    pdf.set_font("Arial", 'B', 11)
+    pdf.cell(190, 10, txt="2. OPTIMIZACIÓN DEL GASTO OPERATIVO (ALIMENTO):", ln=True)
+    pdf.set_font("Arial", size=10)
+    pdf.cell(95, 10, txt=f"Gasto Actual (FCR {fcr_a}):", border=1)
+    pdf.cell(95, 10, txt=f"S/ {gasto_a:,.2f}", border=1, ln=True)
+    pdf.cell(95, 10, txt=f"Meta BE2SCALE (FCR {fcr_o:.2f}):", border=1)
+    pdf.cell(95, 10, txt=f"S/ {gasto_o:,.2f}", border=1, ln=True)
+    
+    # Cuadro de Rescate Destacado
     pdf.ln(5)
     pdf.set_fill_color(0, 137, 123)
     pdf.set_text_color(255, 255, 255)
     pdf.set_font("Arial", 'B', 14)
-    pdf.cell(190, 15, txt=f"CAPITAL RESCATADO POR CICLO: S/ {ahorro:,.2f}", border=1, ln=True, align='C', fill=True)
+    pdf.cell(190, 15, txt=f"AHORRO NETO PROYECTADO POR CICLO: S/ {ahorro:,.2f}", border=1, ln=True, align='C', fill=True)
     
-    # Al final del PDF, antes de las firmas:
-pdf.ln(5)
-pdf.set_font("Arial", 'B', 9)
-pdf.cell(190, 8, txt="DECLARACIÓN DE CONFORMIDAD:", ln=True)
-pdf.set_font("Arial", size=8)
-pdf.multi_cell(190, 5, txt="El presente reporte técnico ha sido generado bajo los lineamientos de ingeniería acuícola de BE2SCALE, asegurando que el cálculo de FCR y Capacidad de Carga respeta los parámetros de bienestar animal y eficiencia productiva exigidos por PRODUCE para el sector AMYPE.")
+    # 4. Declaración de Conformidad NTP
+    pdf.ln(10)
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font("Arial", 'B', 9)
+    pdf.cell(190, 8, txt="DECLARACIÓN DE CONFORMIDAD NORMATIVA:", ln=True)
+    pdf.set_font("Arial", size=8)
+    pdf.multi_cell(190, 5, txt="El presente reporte certifica que el cálculo de FCR y capacidad de carga se ha realizado bajo los lineamientos técnicos de la NTP 032.103:2024. Se recomienda al cliente mantener los registros diarios para validar este ahorro ante PRODUCE/SANIPES.")
 
-# Firmas de Conformidad
-pdf.ln(25)
-pdf.set_text_color(0, 0, 0)
-pdf.set_font("Arial", 'B', 10)
-pdf.cell(95, 10, txt="__________________________", ln=0, align='C')
-pdf.cell(95, 10, txt="__________________________", ln=1, align='C')
-pdf.cell(95, 5, txt="Ing. William Bernuy E.", ln=0, align='C')
-pdf.cell(95, 5, txt="Conformidad del Cliente", ln=1, align='C')
-pdf.set_font("Arial", size=8)
-pdf.cell(95, 5, txt="Director Estratégico BE2SCALE", ln=0, align='C')
-pdf.cell(95, 5, txt=f"{entidad_nombre}", ln=1, align='C')
-return pdf.output(dest='S').encode('latin-1')
+    # 5. Firmas
+    pdf.ln(20)
+    pdf.set_font("Arial", 'B', 10)
+    pdf.cell(95, 10, txt="__________________________", ln=0, align='C')
+    pdf.cell(95, 10, txt="__________________________", ln=1, align='C')
+    pdf.cell(95, 5, txt="Ing. William Bernuy E.", ln=0, align='C')
+    pdf.cell(95, 5, txt="Conformidad del Cliente", ln=1, align='C')
+    
+    return pdf.output(dest='S').encode('latin-1')
 
-# Botón en Sidebar
+# --- BOTÓN DE DISPARO (Asegúrate que esté fuera de la función) ---
 st.sidebar.write("---")
-if st.sidebar.button("📄 GENERAR REPORTE PDF FINAL"):
-    # Asegúrate que estas variables (tipo_tanque, volumen, densidad_max, biomasa_max) 
-    # coincidan con las de tu Tab 3
-    pdf_bytes = create_final_pdf(tipo_tanque, volumen, densidad_max, biomasa_max)
-    st.sidebar.download_button(label="⬇️ DESCARGAR AHORA", data=pdf_bytes, file_name=f"Informe_BE2SCALE_{entidad_nombre}.pdf", mime="application/pdf")
-
+if st.sidebar.button("📄 GENERAR REPORTE DE CUMPLIMIENTO"):
+    # Llamamos a la función con todas las variables calculadas en las pestañas
+    pdf_bytes = create_final_pdf(entidad_nombre, tm_objetivo, fcr_actual, fcr_objetivo, gasto_actual, gasto_meta, ahorro, o2_real, status_o2, tipo_tanque, volumen, densidad_max, biomasa_max)
+    st.sidebar.download_button(label="⬇️ DESCARGAR PDF", data=pdf_bytes, file_name=f"Reporte_Cumplimiento_{entidad_nombre}.pdf", mime="application/pdf")
 
 st.caption("BE2SCALE v1.8 | Ingeniería de Precisión para el Perú.")
