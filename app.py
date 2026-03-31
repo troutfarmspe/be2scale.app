@@ -55,7 +55,7 @@ else:
     nota_o2 = "Condiciones ideales para conversión alimenticia de alta velocidad."
 
 # --- CREACIÓN DE PESTAÑAS ---
-tab1, tab2, tab3 = st.tabs(["💰 Análisis Económico", "🧬 Ingeniería Bio-Térmica", "📐 Capacidad de Carga"])
+tab1, tab2, tab3, tab4 = st.tabs(["💰 Análisis Económico", "🧬 Ingeniería Bio-Térmica", "📐 Capacidad de Carga", "⚖️ Cumplimiento Normativo"])
 
 with tab1:
     st.subheader(f"Simulación de Eficiencia: {entidad_nombre}")
@@ -103,6 +103,32 @@ with tab3:
         volumen = st.number_input("Volumen Total (m³)", value=100, step=10)
     with col_t2:
         recambio_hora = st.slider("Recambios de agua por hora (R)", 0.5, 4.0, 1.0, help="Veces que se renueva el volumen total en 1 hora.")
+
+with tab4:
+    st.subheader("⚖️ Marco Normativo y Cumplimiento (PRODUCE)")
+    st.write("Verificación de estándares según la normativa técnica peruana vigente.")
+
+    st.markdown("""
+    <div style="background-color:#112240; padding:15px; border-radius:10px; border-left: 5px solid #FFA500;">
+        <p style="color:white; margin:0; font-weight:bold;">NTP 032.103:2024 - ACUICULTURA</p>
+        <p style="color:gray; font-size:0.9em;">Método para la determinación del Factor de Conversión Alimenticia (FCA) en Trucha Arcoíris.</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    col_l1, col_l2 = st.columns(2)
+    with col_l1:
+        cumple_registro = st.checkbox("¿Cuenta con Registro Diario de Alimentación?")
+        cumple_biometria = st.checkbox("¿Realiza Biometrías Mensuales?")
+    with col_l2:
+        cumple_muestreo = st.checkbox("¿Aplica muestreo representativo (5-10%)?")
+        cumple_sanipes = st.checkbox("¿Cuenta con Protocolo Sanitario vigente?")
+
+    if cumple_registro and cumple_biometria and cumple_muestreo:
+        st.success("✅ Los datos ingresados cumplen con el rigor metodológico de la NTP 032.103:2024.")
+    else:
+        st.warning("⚠️ Atención: Para que este reporte tenga validez ante PRODUCE, debe regularizar sus protocolos de muestreo y registro.")
+
+    st.info("**Nota para AMYPE:** El cumplimiento de estas normas es requisito para la renovación de derechos acuícolas y el acceso a créditos de FONDEPES.")
 
     # --- LÓGICA DE INGENIERÍA AQUA-SCALE ---
     # 1. Consumo de O2 estimado para Trucha (0.2 - 0.4 g O2 / kg pez / hora)
