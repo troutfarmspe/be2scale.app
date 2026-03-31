@@ -175,6 +175,7 @@ def create_final_pdf(tipo, vol, dens_max, bio_max):
     pdf.set_text_color(100, 100, 100)
     pdf.cell(190, 5, txt=f"BE2SCALE - AQUAMARKET S.A.C. | RUC: 20601363628 | {datetime.datetime.now().strftime('%d/%m/%Y')}", ln=True, align='C')
    
+    # En el encabezado del PDF, debajo del título:
     pdf.set_font("Arial", 'I', 8)
     pdf.cell(190, 5, txt="Basado en la Norma Técnica Peruana NTP 032.103:2024 y estándares AMYPE", ln=True, align='C')
     pdf.ln(10)
@@ -216,6 +217,12 @@ def create_final_pdf(tipo, vol, dens_max, bio_max):
     pdf.set_font("Arial", 'B', 14)
     pdf.cell(190, 15, txt=f"CAPITAL RESCATADO POR CICLO: S/ {ahorro:,.2f}", border=1, ln=True, align='C', fill=True)
     
+    # Al final del PDF, antes de las firmas:
+    pdf.ln(5)
+    pdf.set_font("Arial", 'B', 9)
+    pdf.cell(190, 8, txt="DECLARACIÓN DE CONFORMIDAD:", ln=True)
+    pdf.set_font("Arial", size=8)
+    pdf.multi_cell(190, 5, txt="El presente reporte técnico ha sido generado bajo los lineamientos de ingeniería acuícola de BE2SCALE, asegurando que el cálculo de FCR y Capacidad de Carga respeta los parámetros de bienestar animal y eficiencia productiva exigidos por PRODUCE para el sector AMYPE.") 
     # Firmas de Conformidad
     pdf.ln(25)
     pdf.set_text_color(0, 0, 0)
