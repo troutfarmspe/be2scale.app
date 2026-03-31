@@ -224,19 +224,18 @@ pdf.cell(190, 8, txt="DECLARACIÓN DE CONFORMIDAD:", ln=True)
 pdf.set_font("Arial", size=8)
 pdf.multi_cell(190, 5, txt="El presente reporte técnico ha sido generado bajo los lineamientos de ingeniería acuícola de BE2SCALE, asegurando que el cálculo de FCR y Capacidad de Carga respeta los parámetros de bienestar animal y eficiencia productiva exigidos por PRODUCE para el sector AMYPE.")
 
-    # Firmas de Conformidad
-    pdf.ln(25)
-    pdf.set_text_color(0, 0, 0)
-    pdf.set_font("Arial", 'B', 10)
-    pdf.cell(95, 10, txt="__________________________", ln=0, align='C')
-    pdf.cell(95, 10, txt="__________________________", ln=1, align='C')
-    pdf.cell(95, 5, txt="Ing. William Bernuy E.", ln=0, align='C')
-    pdf.cell(95, 5, txt="Conformidad del Cliente", ln=1, align='C')
-    pdf.set_font("Arial", size=8)
-    pdf.cell(95, 5, txt="Director Estratégico BE2SCALE", ln=0, align='C')
-    pdf.cell(95, 5, txt=f"{entidad_nombre}", ln=1, align='C')
-
-    return pdf.output(dest='S').encode('latin-1')
+# Firmas de Conformidad
+pdf.ln(25)
+pdf.set_text_color(0, 0, 0)
+pdf.set_font("Arial", 'B', 10)
+pdf.cell(95, 10, txt="__________________________", ln=0, align='C')
+pdf.cell(95, 10, txt="__________________________", ln=1, align='C')
+pdf.cell(95, 5, txt="Ing. William Bernuy E.", ln=0, align='C')
+pdf.cell(95, 5, txt="Conformidad del Cliente", ln=1, align='C')
+pdf.set_font("Arial", size=8)
+pdf.cell(95, 5, txt="Director Estratégico BE2SCALE", ln=0, align='C')
+pdf.cell(95, 5, txt=f"{entidad_nombre}", ln=1, align='C')
+return pdf.output(dest='S').encode('latin-1')
 
 # Botón en Sidebar
 st.sidebar.write("---")
