@@ -94,6 +94,33 @@ with tab2:
     st.write(f"**Cálculo Termodinámico:** {altitud} msnm / {temp_agua} °C")
     st.progress(min(o2_real/12.0, 1.0))
 
+with tab3:
+    st.subheader("📐 Cálculo de Capacidad de Carga (Carrying Capacity)")
+    st.write("Determinación de densidad máxima basada en el flujo de Oxígeno disponible.")
+
+    tipo_tanque = st.selectbox("Tipo de Estructura", ["Circular (Concreto/Geomembrana)", "Rectangular (Raceway)", "Jaula Flotante"])
+    volumen = st.number_input("Volumen Total de Cultivo (m³)", value=100, step=10)
+
+    # Lógica Técnica: La capacidad de carga depende directamente del O2 Real calculado en Tab 2
+    # Estándar técnico: Se requiere aprox 1.2 a 1.5 kg de trucha por cada 1 mg/L de O2 disponible por m3 (simplificado)
+    factor_forma = 1.2 if tipo_tanque == "Jaula Flotante" else 1.5
+    densidad_max = o2_real * factor_forma
+    biomasa_max = densidad_max * volumen
+
+    # Visualización de Velocímetro de Carga
+    st.markdown(f"""
+        <div style="background-color:#112240; padding:20px; border-radius:10px; border-top: 5px solid #00897B;">
+            <p style="color:gray; margin:0;">DENSIDAD MÁXIMA SUGERIDA</p>
+            <h2 style="color:#00897B; margin:0;">{densidad_max:.2f} kg/m³</h2>
+            <hr>
+            <p style="color:gray; margin:0;">CAPACIDAD TOTAL DEL SISTEMA</p>
+            <h1 style="color:white; margin:0;">{biomasa_max:,.0f} Kg de Trucha</h1>
+        </div>
+    """, unsafe_allow_html=True)
+
+    st.info(f"**Nota Técnica:** A {altitud} msnm, su límite biológico es de {densidad_max:.1f} kg/m³. Superar este número sin aireación mecánica causará un pico de FCR y mortalidad por estrés hipóxico.")
+
+
 # --- FUNCIÓN DE REPORTE PDF AVANZADO ---
 def create_final_pdf():
     pdf = FPDF()
