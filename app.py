@@ -223,6 +223,9 @@ def create_final_pdf(nombre, tm, fcr_a, fcr_o, gasto_a, gasto_o, ahorro, o2, sta
     pdf.cell(95, 10, txt="__________________________", ln=1, align='C')
     pdf.cell(95, 5, txt="Ing. William Bernuy E.", ln=0, align='C')
     pdf.cell(95, 5, txt="Conformidad del Cliente", ln=1, align='C')
+    pdf.set_font("Arial", size=8)
+    pdf.cell(95, 5, txt="Director Estratégico BE2SCALE", ln=0, align='C')
+    pdf.cell(95, 5, txt=f"{entidad_nombre}", ln=1, align='C'
     
     return pdf.output(dest='S').encode('latin-1')
 
