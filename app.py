@@ -122,7 +122,7 @@ with tab3:
 
 
 # --- FUNCIÓN DE REPORTE PDF AVANZADO ---
-def create_final_pdf():
+def create_final_pdf(tipo, vol, dens_max, bio_max):
     pdf = FPDF()
     pdf.add_page()
     
@@ -139,14 +139,25 @@ def create_final_pdf():
     pdf.set_font("Arial", 'B', 12)
     pdf.cell(190, 10, txt=f" CLIENTE: {entidad_nombre.upper()}", border=1, ln=True, fill=False)
     
-    # Diagnóstico Bio-Térmico
+    # 1. Diagnóstico Bio-Térmico
     pdf.ln(5)
     pdf.set_font("Arial", 'B', 11)
     pdf.cell(190, 10, txt="1. DIAGNÓSTICO BIOMÉTRICO (SATURACIÓN O2):", ln=True)
     pdf.set_font("Arial", size=10)
     pdf.multi_cell(190, 6, txt=f"A una altitud de {altitud} msnm y temperatura de {temp_agua}C, el oxígeno disponible es de {o2_real:.2f} mg/L. Estatus: {status_o2}. {nota_o2}")
-    
-    # Análisis Financiero
+
+    # 2. CAPACIDAD DE CARGA DE INFRAESTRUCTURA (Nuevo Bloque)
+    pdf.ln(5)
+    pdf.set_font("Arial", 'B', 11)
+    pdf.cell(190, 10, txt=f"2. EVALUACIÓN DE INFRAESTRUCTURA ({tipo.upper()}):", ln=True)
+    pdf.set_font("Arial", size=10)
+    pdf.cell(95, 8, txt=f" Volumen de Cultivo: {vol} m3", border=1)
+    pdf.cell(95, 8, txt=f" Densidad Máxima sugerida: {dens_max:.2f} kg/m3", border=1, ln=True)
+    pdf.set_font("Arial", 'B', 10)
+    pdf.cell(190, 8, txt=f" Límite Biológico del Sistema: {bio_max:,.0f} Kg de Trucha", border=1, ln=True, align='C')
+    pdf.ln(5)
+
+    # 3. Análisis Financiero
     pdf.ln(5)
     pdf.set_font("Arial", 'B', 11)
     pdf.cell(190, 10, txt="2. OPTIMIZACIÓN DEL GASTO OPERATIVO:", ln=True)
@@ -179,7 +190,10 @@ def create_final_pdf():
 # Botón en Sidebar
 st.sidebar.write("---")
 if st.sidebar.button("📄 GENERAR REPORTE PDF FINAL"):
-    pdf_bytes = create_final_pdf()
+    # Asegúrate que estas variables (tipo_tanque, volumen, densidad_max, biomasa_max) 
+    # coincidan con las de tu Tab 3
+    pdf_bytes = create_final_pdf(tipo_tanque, volumen, densidad_max, biomasa_max)
     st.sidebar.download_button(label="⬇️ DESCARGAR AHORA", data=pdf_bytes, file_name=f"Informe_BE2SCALE_{entidad_nombre}.pdf", mime="application/pdf")
+
 
 st.caption("BE2SCALE v1.8 | Ingeniería de Precisión para el Perú.")
