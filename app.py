@@ -223,6 +223,7 @@ def create_final_pdf(tipo, vol, dens_max, bio_max):
     pdf.cell(190, 8, txt="DECLARACIÓN DE CONFORMIDAD:", ln=True)
     pdf.set_font("Arial", size=8)
     pdf.multi_cell(190, 5, txt="El presente reporte técnico ha sido generado bajo los lineamientos de ingeniería acuícola de BE2SCALE, asegurando que el cálculo de FCR y Capacidad de Carga respeta los parámetros de bienestar animal y eficiencia productiva exigidos por PRODUCE para el sector AMYPE.") 
+   
     # Firmas de Conformidad
     pdf.ln(25)
     pdf.set_text_color(0, 0, 0)
