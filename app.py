@@ -17,9 +17,9 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# 2. Encabezado Institucional
+# 2. Encabezado
 st.title("📊 BE2SCALE")
-st.markdown("### **Bio-Economic Optimizer v1.7**")
+st.markdown("### **Bio-Economic Optimizer v1.8**")
 st.write("---")
 
 # 3. Sidebar: Parámetros Compartidos
@@ -34,6 +34,25 @@ temp_agua = st.sidebar.slider("Temperatura del Agua (°C)", 5.0, 20.0, 12.0)
 costo_alimento = st.sidebar.number_input("Costo Alimento (S/ por Kg)", value=4.85)
 
 st.sidebar.info("AQUAMARKET S.A.C. | RUC: 20601363628")
+
+# --- LÓGICA TERMODINÁMICA (Para ambas pestañas) ---
+p_atm = 760 * math.exp(-altitud / 8000)
+o2_base = 14.603 - 0.4025 * temp_agua + 0.0077 * (temp_agua**2)
+o2_real = o2_base * (p_atm / 760)
+
+# Definición de Semáforo
+if o2_real < 5.5:
+    color_hex = "#FF4B4B" # Rojo
+    status_o2 = "CRÍTICO (HIPOXIA)"
+    nota_o2 = "Riesgo inminente. El metabolismo está bloqueado. El FCR se dispara."
+elif 5.5 <= o2_real < 7.0:
+    color_hex = "#FFA500" # Naranja/Amarillo
+    status_o2 = "ALERTA (ESTRÉS)"
+    nota_o2 = "Eficiencia reducida. El crecimiento es lento y el desperdicio es alto."
+else:
+    color_hex = "#00897B" # Verde BE2SCALE
+    status_o2 = "ÓPTIMO (PRECISIÓN)"
+    nota_o2 = "Condiciones ideales para conversión alimenticia de alta velocidad."
 
 # --- CREACIÓN DE PESTAÑAS ---
 tab1, tab2 = st.tabs(["💰 Análisis Económico", "🧬 Ingeniería Bio-Térmica"])
@@ -60,106 +79,80 @@ with tab1:
     st.info(f"Diagnóstico: La optimización técnica libera S/ {ahorro:,.2f} de presupuesto operativo.")
 
 with tab2:
-    st.subheader("Análisis de Saturación de Oxígeno (O2)")
-    p_atm = 760 * math.exp(-altitud / 8000)
-    o2_base = 14.603 - 0.4025 * temp_agua + 0.0077 * (temp_agua**2)
-    o2_real = o2_base * (p_atm / 760)
-
-    if o2_real < 5.5:
-        color_status = "CRÍTICO"
-        nota = "Peligro de Hipoxia severa. El metabolismo biológico está bloqueado."
-    elif 5.5 <= o2_real < 7.0:
-        color_status = "ALERTA"
-        nota = "Estrés metabólico detectado. El FCR aumentará por baja asimilación."
-    else:
-        color_status = "ÓPTIMO"
-        nota = "Condiciones ideales para conversión alimenticia de alta precisión."
-
-    st.markdown(f"### Estatus: **{color_status}**")
+    st.subheader("Disponibilidad de Oxígeno Real (O2)")
+    
+    # Visualización de Semáforo Dinámico
+    st.markdown(f"""
+        <div style="background-color:#112240; padding:30px; border-radius:15px; border-left: 12px solid {color_hex};">
+            <h3 style="color:white; margin:0;">ESTADO: {status_o2}</h3>
+            <h1 style="color:{color_hex}; margin:10px 0;">{o2_real:.2f} mg/L</h1>
+            <p style="color:#CCCCCC; font-size:1.1em;">{nota_o2}</p>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    st.write("---")
+    st.write(f"**Cálculo Termodinámico:** {altitud} msnm / {temp_agua} °C")
     st.progress(min(o2_real/12.0, 1.0))
-    st.write(f"**Oxígeno Disponible:** {o2_real:.2f} mg/L a {altitud} msnm.")
-    st.write(f"> **Veredicto:** {nota}")
 
-# --- FUNCIÓN DE REPORTE AVANZADO (PDF) ---
-def create_advanced_pdf(nombre, tm, fcr_a, fcr_o, g_a, g_o, ahorro, o2, alt, temp, status, nota):
+# --- FUNCIÓN DE REPORTE PDF AVANZADO ---
+def create_final_pdf():
     pdf = FPDF()
     pdf.add_page()
     
-    # Encabezado Corporativo
+    # Título y Marca
     pdf.set_font("Arial", 'B', 18)
-    pdf.set_text_color(0, 51, 102) # Azul Marino
-    pdf.cell(190, 15, txt="INFORME DE INGENIERÍA Y RENTABILIDAD", ln=True, align='C')
-    pdf.set_font("Arial", 'B', 10)
-    pdf.cell(190, 5, txt="BE2SCALE - División de Consultoría Estratégica Aquamarket S.A.C.", ln=True, align='C')
+    pdf.set_text_color(0, 51, 102)
+    pdf.cell(190, 15, txt="INFORME TÉCNICO DE RENTABILIDAD", ln=True, align='C')
     pdf.set_font("Arial", size=9)
-    pdf.cell(190, 5, txt=f"Emitido: {datetime.datetime.now().strftime('%d/%m/%Y')} | RUC: 20601363628", ln=True, align='C')
+    pdf.set_text_color(100, 100, 100)
+    pdf.cell(190, 5, txt=f"BE2SCALE - AQUAMARKET S.A.C. | RUC: 20601363628 | {datetime.datetime.now().strftime('%d/%m/%Y')}", ln=True, align='C')
+    
     pdf.ln(10)
-
-    # Bloque 1: Resumen de Entidad
-    pdf.set_fill_color(240, 240, 240)
-    pdf.set_font("Arial", 'B', 11)
-    pdf.cell(190, 10, txt=f" ENTIDAD: {nombre.upper()}", border=1, ln=True, fill=True)
-    pdf.set_font("Arial", size=10)
-    pdf.cell(95, 8, txt=f" Biomasa Proyectada: {tm} TM", border=1)
-    pdf.cell(95, 8, txt=f" Altitud: {alt} m.s.n.m.", border=1, ln=True)
-    pdf.ln(5)
-
-    # Bloque 2: Diagnóstico Bio-Térmico (Ciencia)
-    pdf.set_font("Arial", 'B', 11)
-    pdf.set_text_color(200, 0, 0) if o2 < 5.5 else pdf.set_text_color(0, 100, 0)
-    pdf.cell(190, 10, txt=f" DIAGNÓSTICO BIO-TÉRMICO (Status: {status})", ln=True)
     pdf.set_text_color(0, 0, 0)
-    pdf.set_font("Arial", size=10)
-    pdf.multi_cell(190, 6, txt=f"Basado en la Ley de Henry y la cinética térmica a {temp} C, la saturación máxima de Oxígeno Disuelto es de {o2:.2f} mg/L. {nota}")
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(190, 10, txt=f" CLIENTE: {entidad_nombre.upper()}", border=1, ln=True, fill=False)
+    
+    # Diagnóstico Bio-Térmico
     pdf.ln(5)
-
-    # Bloque 3: Análisis Económico (Cuadro Comparativo)
     pdf.set_font("Arial", 'B', 11)
-    pdf.cell(190, 10, txt=" RESUMEN DE OPTIMIZACIÓN FINANCIERA", ln=True)
-    pdf.set_font("Arial", 'B', 10)
-    pdf.cell(63, 10, txt="Escenario", border=1, align='C')
-    pdf.cell(63, 10, txt="FCR", border=1, align='C')
-    pdf.cell(64, 10, txt="Inversión Alimento", border=1, ln=True, align='C')
-    
+    pdf.cell(190, 10, txt="1. DIAGNÓSTICO BIOMÉTRICO (SATURACIÓN O2):", ln=True)
     pdf.set_font("Arial", size=10)
-    pdf.cell(63, 10, txt="Línea Base (Actual)", border=1, align='C')
-    pdf.cell(63, 10, txt=f"{fcr_a}", border=1, align='C')
-    pdf.cell(64, 10, txt=f"S/ {g_a:,.2f}", border=1, ln=True, align='C')
+    pdf.multi_cell(190, 6, txt=f"A una altitud de {altitud} msnm y temperatura de {temp_agua}C, el oxígeno disponible es de {o2_real:.2f} mg/L. Estatus: {status_o2}. {nota_o2}")
     
-    pdf.set_font("Arial", 'B', 10)
-    pdf.cell(63, 10, txt="Meta BE2SCALE", border=1, align='C')
-    pdf.cell(63, 10, txt=f"{fcr_o:.2f}", border=1, align='C')
-    pdf.cell(64, 10, txt=f"S/ {g_o:,.2f}", border=1, ln=True, align='C')
+    # Análisis Financiero
     pdf.ln(5)
-
-    # Bloque 4: El Rescate (Monto Final)
-    pdf.set_fill_color(0, 137, 123) # Verde BE2SCALE
+    pdf.set_font("Arial", 'B', 11)
+    pdf.cell(190, 10, txt="2. OPTIMIZACIÓN DEL GASTO OPERATIVO:", ln=True)
+    pdf.set_font("Arial", size=10)
+    pdf.cell(95, 10, txt=f"Gasto Actual (FCR {fcr_actual}):", border=1)
+    pdf.cell(95, 10, txt=f"S/ {gasto_actual:,.2f}", border=1, ln=True)
+    pdf.cell(95, 10, txt=f"Meta BE2SCALE (FCR {fcr_objetivo:.2f}):", border=1)
+    pdf.cell(95, 10, txt=f"S/ {gasto_meta:,.2f}", border=1, ln=True)
+    
+    pdf.ln(5)
+    pdf.set_fill_color(0, 137, 123)
     pdf.set_text_color(255, 255, 255)
     pdf.set_font("Arial", 'B', 14)
-    pdf.cell(190, 15, txt=f" CAPITAL RESCATADO POR CICLO: S/ {ahorro:,.2f} ", border=1, ln=True, align='C', fill=True)
+    pdf.cell(190, 15, txt=f"CAPITAL RESCATADO POR CICLO: S/ {ahorro:,.2f}", border=1, ln=True, align='C', fill=True)
     
-    # Bloque 5: Metodología
-    pdf.ln(10)
+    # Firmas de Conformidad
+    pdf.ln(25)
     pdf.set_text_color(0, 0, 0)
     pdf.set_font("Arial", 'B', 10)
-    pdf.cell(190, 8, txt="METODOLOGÍA DE INTERVENCIÓN BE2SCALE:", ln=True)
-    pdf.set_font("Arial", size=9)
-    pdf.multi_cell(190, 5, txt="1. Ajuste Dinámico de Raciones: Sincronización metabólica según T de agua.\n2. Tech-Audit: Optimización de infraestructura de aireación y flujo hidráulico.\n3. Monitoreo Predictivo: Control de datos para evitar desperdicio de pellet en fondo.")
-
-    # Firma
-    pdf.ln(20)
-    pdf.set_font("Arial", 'B', 10)
-    pdf.cell(190, 5, txt="_______________________________________", ln=True, align='R')
-    pdf.cell(190, 5, txt="Ing. William Bernuy Espinoza", ln=True, align='R')
-    pdf.set_font("Arial", size=9)
-    pdf.cell(190, 5, txt="Director Estratégico BE2SCALE", ln=True, align='R')
+    pdf.cell(95, 10, txt="__________________________", ln=0, align='C')
+    pdf.cell(95, 10, txt="__________________________", ln=1, align='C')
+    pdf.cell(95, 5, txt="Ing. William Bernuy E.", ln=0, align='C')
+    pdf.cell(95, 5, txt="Conformidad del Cliente", ln=1, align='C')
+    pdf.set_font("Arial", size=8)
+    pdf.cell(95, 5, txt="Director Estratégico BE2SCALE", ln=0, align='C')
+    pdf.cell(95, 5, txt=f"{entidad_nombre}", ln=1, align='C')
 
     return pdf.output(dest='S').encode('latin-1')
 
-# Botón de Descarga en Sidebar
+# Botón en Sidebar
 st.sidebar.write("---")
-if st.sidebar.button("📄 GENERAR INFORME AVANZADO"):
-    pdf_bytes = create_advanced_pdf(entidad_nombre, tm_objetivo, fcr_actual, fcr_objetivo, gasto_actual, gasto_meta, ahorro, o2_real, altitud, temp_agua, color_status, nota)
-    st.sidebar.download_button(label="⬇️ DESCARGAR REPORTE", data=pdf_bytes, file_name=f"Informe_BE2SCALE_{entidad_nombre}.pdf", mime="application/pdf")
+if st.sidebar.button("📄 GENERAR REPORTE PDF FINAL"):
+    pdf_bytes = create_final_pdf()
+    st.sidebar.download_button(label="⬇️ DESCARGAR AHORA", data=pdf_bytes, file_name=f"Informe_BE2SCALE_{entidad_nombre}.pdf", mime="application/pdf")
 
-st.caption("BE2SCALE v1.7 | Rigor Científico para la Acuicultura Peruana")
+st.caption("BE2SCALE v1.8 | Ingeniería de Precisión para el Perú.")
